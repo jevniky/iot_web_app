@@ -20,6 +20,7 @@ function onConnectionLost(responseObject) {
 
 // in case of a message arrival
 function onMessageArrived(message) {
+  console.log(message.destinationName+" "+message.payloadString);
   var device_sn = "";
   // split the topic
   var topic_split = message.destinationName.split("/")

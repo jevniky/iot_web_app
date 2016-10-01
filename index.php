@@ -20,10 +20,10 @@ include 'init.php';
       <h1>Partizani home</h1>
       <div id="conn_status"></div>
       <div id="conn">&nbsp</div>
-      <div id="msg">helo</div>
       <?php
       echo '<table class="table">';
       echo '<tr><th>Serial No.</th><th>Device type</th><th>IP address</th><th>State</th><th>Location</th><th>Value</th></tr>';
+      echo '<tr><td>N/A</td><td>CPU</td><td>192.168.0.12</td><td id="cpu_state">N/A</td><td>N/A</td><td>N/A</td></tr>';
       foreach ($devices as $key => $device) {
         echo "<tr>";
         foreach ($device as $index => $value) {
