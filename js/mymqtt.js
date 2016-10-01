@@ -28,9 +28,13 @@ function onMessageArrived(message) {
     device_sn = topic_split[1]; // The second part of the topic must be the SN
     if ( "state" == topic_split[2] ) { // If the topic is about device state
       if ( "0" == message.payloadString ) { // If the device went offline
-        document.getElementById(device_sn+"_state").innerHTML = "OFF";
+        if ( document.getElementById(device_sn+"_state") ) {
+          document.getElementById(device_sn+"_state").innerHTML = "OFF";
+        }
       } else if ( "1" == message.payloadString ) { // If the device went offline
-        document.getElementById(device_sn+"_state").innerHTML = "ON"; // Just in case if the device went back on, and it was still in the table
+        if ( document.getElementById(device_sn+"_state") ) {
+          document.getElementById(device_sn+"_state").innerHTML = "ON"; // Just in case if the device went back on, and it was still in the table
+        }
       }
     }
   } else if ( "tempout" == topic_split[1] ) {
