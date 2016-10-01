@@ -16,31 +16,4 @@ if ( $result->num_rows > 0 ){
                        'location' => $row["location"]);
   }
 }
-
-echo '<table class="table">';
-echo '<tr><th>Serial No.</th><th>Device type</th><th>IP address</th><th>State</th><th>Location</th><th>Value</th></tr>';
-foreach ($devices as $key => $device) {
-  echo "<tr>";
-  foreach ($device as $index => $value) {
-    if ( "online" == $index ) {
-      if ( 1 == $value ) {
-        echo '<td id="'.$device['sn'].'_state">ON</td>';
-      } else {
-        echo '<td id="'.$device['sn'].'_state">OFF</td>';
-      }
-    } else if ( "location" == $index ) {
-      if ( "" == $value ) {
-        echo "<td>N/A</td>";
-      } else {
-        echo "<td>".$value."</td>";
-      }
-    } else {
-      echo "<td>".$value."</td>";
-    }
-  }
-  // Cell for mesured value
-  echo '<td id="'.$device['sn'].'_val">N/A</td>';
-  echo "</tr>";
-}
-echo '</table>';
 ?>

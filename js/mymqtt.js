@@ -17,6 +17,7 @@ function onConnectionLost(responseObject) {
   document.getElementById("conn_status").style.backgroundColor = "#bc0000";
   document.getElementById("conn").innerHTML = "connection lost: " + responseObject.errorMessage;
 };
+
 // in case of a message arrival
 function onMessageArrived(message) {
   var device_sn = "";
@@ -38,23 +39,6 @@ function onMessageArrived(message) {
   } else {
     // TODO Sth is wrong - bad topic
   }
-
-
-// check for topic of a message (destination name)
-switch(message.destinationName){
-  case "power":
-    power = parseFloat(message.payloadString);
-    document.getElementById("power").innerHTML = power.toFixed(1);
-    break;
-  case "powerWeb":
-    power = parseFloat(message.payloadString);
-    document.getElementById("power").innerHTML = power.toFixed(1);
-    break;
-  case "temperature":
-    //var temperature = message.payloadString;
-    document.getElementById("temperature").innerHTML = parseFloat(message.payloadString).toFixed(2)
-    break;
-  };
 };
 
 var options = {
@@ -63,8 +47,9 @@ var options = {
     document.getElementById("conn_status").style.backgroundColor = "#009700";
     document.getElementById("conn").innerHTML = "Connected";
     // Connection succeeded; subscribe to our topic, you can add multile lines of these
-    client.subscribe("power", {qos: 0});
-    client.subscribe("powerWeb", {qos: 0});
+    client.subscribe("clients/#", {qos: 0});
+    //client.subscribe("clients/+/info", {qos: 0});
+    client.subscribe('+/tempout', {qos: 0});
   },
   onFailure: function (message) {
     document.getElementById("conn").innerHTML = "Connection failed: " + message.errorMessage;
