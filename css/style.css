@@ -1,0 +1,13 @@
+#conn_status {
+    width: 16px;
+    height: 16px;
+    background-color: #bc0000;
+    float: left;
+    border-radius: 8px;
+    margin: 0px 8px;
+}
+#power {
+  border:0;
+  color:#f6931f;
+  font-weight:bold;
+}
