@@ -29,10 +29,14 @@ function onMessageArrived(message) {
       if ( "0" == message.payloadString ) { // If the device went offline
         if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
           document.getElementById(device_sn+"_state").style.backgroundColor = "#bc0000";
+        } else {
+          new_device();
         }
       } else if ( "1" == message.payloadString ) { // If the device went offline
         if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
           document.getElementById(device_sn+"_state").style.backgroundColor = "#009700"; // In case if the device went back on, and it was still in the table
+        } else {
+          new_device();
         }
       }
     } else if ( "info" == topic_split[2] ) { // Info part
@@ -42,23 +46,11 @@ function onMessageArrived(message) {
         }
       }
     }
-  } else if ( "out" == topic_split[1] ) {
+  } else if ( "tempout" == topic_split[1] ) {
     device_sn = topic_split[0]; // The first part of the topic must be the SN
     var temperature = parseFloat(message.payloadString).toFixed(2); // The payload then must be the temperature measurement
     if ( document.getElementById(device_sn+"_value") != null ) {
       document.getElementById(device_sn+"_value").innerHTML = temperature; // Parse this value to the corespondig cell
-    } else {
-      var table = document.getElementById("devices"); // Get the devices table
-      var row = table.insertRow(-1); // insert row on a first position (on a very top)
-      var cell = row.insertCell(0);
-      cell.setAttribute("colspan", "2");
-      cell.innerHTML = '<i class="fa fa-exclamation" aria-hidden="true"></i> \
-      <i class="fa fa-exclamation" aria-hidden="true"></i> \
-      <i class="fa fa-exclamation" aria-hidden="true"></i> New device. <a href="index.php">Refresh</a>';
-      row.insertCell(1);
-      row.insertCell(2);
-      row.insertCell(3);
-      row.insertCell(4);
     }
   } else {
     // NOTE Sth is wrong - bad topic
@@ -83,3 +75,20 @@ var options = {
 function init() {
   client.connect(options);
 };
+
+function new_device() {
+  if ( document.getElementById(device_sn+"_value") != null ) {
+    var table = document.getElementById("devices"); // Get the devices table
+    var row = table.insertRow(-1); // insert row on a first position (on a very top)
+    var cell = row.insertCell(0);
+    cell.setAttribute("colspan", "2");
+    cell.setAttribute("id", "new_device");
+    cell.innerHTML = '<i class="fa fa-exclamation" aria-hidden="true"></i> \
+    <i class="fa fa-exclamation" aria-hidden="true"></i> \
+    <i class="fa fa-exclamation" aria-hidden="true"></i> New device. <a href="index.php">Refresh</a>';
+    row.insertCell(1);
+    row.insertCell(2);
+    row.insertCell(3);
+    row.insertCell(4);
+  }
+}
