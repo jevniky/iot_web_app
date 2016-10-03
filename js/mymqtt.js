@@ -14,8 +14,7 @@ var power = 0;
 
 // in case of lost connection
 function onConnectionLost(responseObject) {
-  document.getElementById("conn_status").style.backgroundColor = "#bc0000";
-  document.getElementById("conn").innerHTML = "connection lost: " + responseObject.errorMessage;
+  document.getElementById("cpu_state").style.backgroundColor = "#bc0000";
 };
 
 // in case of a message arrival
@@ -28,36 +27,56 @@ function onMessageArrived(message) {
     device_sn = topic_split[1]; // The second part of the topic must be the SN
     if ( "state" == topic_split[2] ) { // If the topic is about device state
       if ( "0" == message.payloadString ) { // If the device went offline
-        if ( document.getElementById(device_sn+"_state") != null ) {
-          document.getElementById(device_sn+"_state").innerHTML = "OFF";
+        if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
+          document.getElementById(device_sn+"_state").style.backgroundColor = "#bc0000";
         }
       } else if ( "1" == message.payloadString ) { // If the device went offline
-        if ( document.getElementById(device_sn+"_state") != null ) {
-          document.getElementById(device_sn+"_state").innerHTML = "ON"; // Just in case if the device went back on, and it was still in the table
+        if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
+          document.getElementById(device_sn+"_state").style.backgroundColor = "#009700"; // In case if the device went back on, and it was still in the table
+        }
+      }
+    } else if ( "info" == topic_split[2] ) { // Info part
+      if ( "ip" == topic_split[3] ) { // IP read
+        if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
+          document.getElementById(device_sn+"_ip").innerHTML = message.payloadString; // Print the IP
         }
       }
     }
-  } else if ( "tempout" == topic_split[1] ) {
+  } else if ( "out" == topic_split[1] ) {
     device_sn = topic_split[0]; // The first part of the topic must be the SN
     var temperature = parseFloat(message.payloadString).toFixed(2); // The payload then must be the temperature measurement
-    document.getElementById(device_sn+"_val").innerHTML = temperature; // Parse this value to the corespondig cell
+    if ( document.getElementById(device_sn+"_value") != null ) {
+      document.getElementById(device_sn+"_value").innerHTML = temperature; // Parse this value to the corespondig cell
+    } else {
+      var table = document.getElementById("devices"); // Get the devices table
+      var row = table.insertRow(-1); // insert row on a first position (on a very top)
+      var cell = row.insertCell(0);
+      cell.setAttribute("colspan", "2");
+      cell.innerHTML = '<i class="fa fa-exclamation" aria-hidden="true"></i> \
+      <i class="fa fa-exclamation" aria-hidden="true"></i> \
+      <i class="fa fa-exclamation" aria-hidden="true"></i> New device. <a href="index.php">Refresh</a>';
+      row.insertCell(1);
+      row.insertCell(2);
+      row.insertCell(3);
+      row.insertCell(4);
+    }
   } else {
-    // TODO Sth is wrong - bad topic
+    // NOTE Sth is wrong - bad topic
   }
 };
 
 var options = {
   timeout: 3,
   onSuccess: function () {
-    document.getElementById("conn_status").style.backgroundColor = "#009700";
-    document.getElementById("conn").innerHTML = "Connected";
+    document.getElementById("cpu_state").style.backgroundColor = "#009700";
     // Connection succeeded; subscribe to our topic, you can add multile lines of these
     client.subscribe("clients/#", {qos: 0});
     //client.subscribe("clients/+/info", {qos: 0});
     client.subscribe('+/tempout', {qos: 0});
   },
   onFailure: function (message) {
-    document.getElementById("conn").innerHTML = "Connection failed: " + message.errorMessage;
+    // document.getElementById("conn").innerHTML = "Connection failed: " + message.errorMessage;
+    document.getElementById("cpu_state").style.backgroundColor = "#bc0000";
   }
 };
 
