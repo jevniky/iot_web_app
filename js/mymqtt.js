@@ -77,7 +77,7 @@ function init() {
 };
 
 function new_device() {
-  if ( document.getElementById(device_sn+"_value") != null ) {
+  if ( document.getElementById("new_device") == null ) {
     var table = document.getElementById("devices"); // Get the devices table
     var row = table.insertRow(-1); // insert row on a first position (on a very top)
     var cell = row.insertCell(0);
