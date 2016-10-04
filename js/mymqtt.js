@@ -29,14 +29,12 @@ function onMessageArrived(message) {
       if ( "0" == message.payloadString ) { // If the device went offline
         if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
           document.getElementById(device_sn+"_state").style.backgroundColor = "#bc0000";
-        } else {
-          new_device();
         }
       } else if ( "1" == message.payloadString ) { // If the device went offline
         if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
           document.getElementById(device_sn+"_state").style.backgroundColor = "#009700"; // In case if the device went back on, and it was still in the table
         } else {
-          new_device();
+          refresh_table(); // Refresh the device table if there is connected device not mentioned in the current table
         }
       }
     } else if ( "info" == topic_split[2] ) { // Info part
@@ -76,19 +74,20 @@ function init() {
   client.connect(options);
 };
 
-function new_device() {
-  if ( document.getElementById("new_device") == null ) {
-    var table = document.getElementById("devices"); // Get the devices table
-    var row = table.insertRow(-1); // insert row on a first position (on a very top)
-    var cell = row.insertCell(0);
-    cell.setAttribute("colspan", "2");
-    cell.setAttribute("id", "new_device");
-    cell.innerHTML = '<i class="fa fa-exclamation" aria-hidden="true"></i> \
-    <i class="fa fa-exclamation" aria-hidden="true"></i> \
-    <i class="fa fa-exclamation" aria-hidden="true"></i> New device. <a href="index.php">Refresh</a>';
-    row.insertCell(1);
-    row.insertCell(2);
-    row.insertCell(3);
-    row.insertCell(4);
-  }
+function refresh_table() {
+    if (window.XMLHttpRequest) {
+        // code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp = new XMLHttpRequest();
+    } else {
+        // code for IE6, IE5
+        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
+    }
+    xmlhttp.onreadystatechange = function() {
+        if (this.readyState == 4 && this.status == 200) {
+            document.getElementById("devices_list").innerHTML = this.responseText;
+        }
+    };
+    xmlhttp.open("GET","get_devices.php",true);
+    xmlhttp.send();
+
 }
