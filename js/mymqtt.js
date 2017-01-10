@@ -20,31 +20,48 @@ function onConnectionLost(responseObject) {
 // in case of a message arrival
 function onMessageArrived(message) {
   console.log(message.destinationName+" "+message.payloadString);
+
   var device_sn = "";
   // split the topic
   var topic_split = message.destinationName.split("/")
-  if ( "clients" == topic_split[0] ) {
-    device_sn = topic_split[1]; // The second part of the topic must be the SN
-    if ( "state" == topic_split[2] ) { // If the topic is about device state
-      if ( "0" == message.payloadString ) { // If the device went offline
-        if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
-          document.getElementById(device_sn+"_state").style.backgroundColor = "#bc0000";
-        }
-      } else if ( "1" == message.payloadString ) { // If the device went offline
-        if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
-          document.getElementById(device_sn+"_state").style.backgroundColor = "#009700"; // In case if the device went back on, and it was still in the table
-        } else {
-          refresh_table(); // Refresh the device table if there is connected device not mentioned in the current table
-        }
-      }
-    } else if ( "info" == topic_split[2] ) { // Info part
-      if ( "ip" == topic_split[3] ) { // IP read
-        if ( document.getElementById(device_sn+"_state") != null ) { // If the element with this ID even exists
-          document.getElementById(device_sn+"_ip").innerHTML = message.payloadString; // Print the IP
-        }
+  device_sn = topic_split[0]; // The first part of the topic must be the SN
+  if ( "state" == topic_split[1] ) // If the topic is about device state
+  {
+    if ( "0" == message.payloadString ) // If the device went offline
+    {
+      if ( document.getElementById(device_sn+"_state") != null ) // If the element with this ID even exists
+      {
+        document.getElementById(device_sn+"_state").style.backgroundColor = "#bc0000";
       }
     }
-  } else if ( "tempout" == topic_split[1] ) {
+    else
+    if ( "1" == message.payloadString ) // If the device went online
+    {
+      if ( document.getElementById(device_sn+"_state") != null ) // If the element with this ID even exists
+      {
+        document.getElementById(device_sn+"_state").style.backgroundColor = "#009700"; // In case if the device went back on, and it was still in the table
+      }
+      else
+      {
+        refresh_table(); // Refresh the device table if there is connected device not mentioned in the current table
+        // the python scrip running on the mqtt server takes care of importing the device to the DB
+        // After this refresh, the device should be already in DB.
+      }
+    }
+  }
+  else
+  if ( "info" == topic_split[1] ) // Info part
+  {
+    if ( "ip" == topic_split[2] ) // IP read
+    {
+      if ( document.getElementById(device_sn+"_state") != null ) // If the element with this ID even exists
+      {
+        document.getElementById(device_sn+"_ip").innerHTML = message.payloadString; // Print the IP
+      }
+    }
+  }
+
+  if ( "tempout" == topic_split[1] ) {
     device_sn = topic_split[0]; // The first part of the topic must be the SN
     var temperature = parseFloat(message.payloadString).toFixed(2); // The payload then must be the temperature measurement
     if ( document.getElementById(device_sn+"_value") != null ) {
@@ -60,9 +77,9 @@ var options = {
   onSuccess: function () {
     document.getElementById("cpu_state").style.backgroundColor = "#009700";
     // Connection succeeded; subscribe to our topic, you can add multile lines of these
-    client.subscribe("clients/#", {qos: 0});
+    client.subscribe("#", {qos: 0});
     //client.subscribe("clients/+/info", {qos: 0});
-    client.subscribe('+/tempout', {qos: 0});
+    // client.subscribe('+/tempout', {qos: 0});
   },
   onFailure: function (message) {
     // document.getElementById("conn").innerHTML = "Connection failed: " + message.errorMessage;
