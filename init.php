@@ -1,11 +1,8 @@
 <?php
-// NOTE Print out only online devices? I guess so...
-// TODO check continuously which devices are online.
-
 // Get all connected online devices from DB
 $devices = array();
 
-$sql = "SELECT * FROM devices WHERE `type` = 'thermometer'";
+$sql = "SELECT * FROM `devices`";
 $result = $conn->query($sql);
 if ( $result->num_rows > 0 ){
   while ( $row = $result->fetch_assoc() ){
