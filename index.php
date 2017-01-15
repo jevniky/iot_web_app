@@ -18,6 +18,7 @@ include 'init.php';
     <?php include 'inc/nav.php'; ?>
     <div class="container">
       <h1>IoT home</h1>
+     Hello...
       <!-- Main table for devices and values -->
       <table class="table" id="devices">
         <thead>

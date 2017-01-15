@@ -24,8 +24,8 @@ function onMessageArrived(message) {
   var device_sn = "";
   // split the topic
   var topic_split = message.destinationName.split("/")
-  device_sn = topic_split[0]; // The first part of the topic must be the SN
-  if ( "state" == topic_split[1] ) // If the topic is about device state
+  device_sn = topic_split[1]; // The second part of the topic must be the SN
+  if ( "state" == topic_split[2] ) // If the topic is about device state
   {
     if ( "0" == message.payloadString ) // If the device went offline
     {
@@ -50,9 +50,9 @@ function onMessageArrived(message) {
     }
   }
   else
-  if ( "info" == topic_split[1] ) // Info part
+  if ( "info" == topic_split[2] ) // Info part
   {
-    if ( "ip" == topic_split[2] ) // IP read
+    if ( "ip" == topic_split[3] ) // IP read
     {
       if ( document.getElementById(device_sn+"_state") != null ) // If the element with this ID even exists
       {
@@ -61,8 +61,8 @@ function onMessageArrived(message) {
     }
   }
 
-  if ( "tempout" == topic_split[1] ) {
-    device_sn = topic_split[0]; // The first part of the topic must be the SN
+  if ( "output" == topic_split[2] ) {
+    device_sn = topic_split[1]; // Thesecond part of the topic must be the SN
     var temperature = parseFloat(message.payloadString).toFixed(2); // The payload then must be the temperature measurement
     if ( document.getElementById(device_sn+"_value") != null ) {
       document.getElementById(device_sn+"_value").innerHTML = temperature; // Parse this value to the corespondig cell
@@ -77,8 +77,10 @@ var options = {
   onSuccess: function () {
     document.getElementById("cpu_state").style.backgroundColor = "#009700";
     // Connection succeeded; subscribe to our topic, you can add multile lines of these
-    client.subscribe("#", {qos: 0});
-    //client.subscribe("clients/+/info", {qos: 0});
+    client.subscribe("sensor/+/state", {qos: 0});
+    client.subscribe("sensor/+/info/#", {qos: 0});
+    client.subscribe("sensor/+/output", {qos: 0});
+    // client.subscribe("clients/+/info", {qos: 0});
     // client.subscribe('+/tempout', {qos: 0});
   },
   onFailure: function (message) {
@@ -95,10 +97,8 @@ function refresh_table() {
     if (window.XMLHttpRequest) {
         // code for IE7+, Firefox, Chrome, Opera, Safari
         xmlhttp = new XMLHttpRequest();
-    } else {
-        // code for IE6, IE5
-        xmlhttp = new ActiveXObject("Microsoft.XMLHTTP");
     }
+
     xmlhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
             document.getElementById("devices_list").innerHTML = this.responseText;
